@@ -10,20 +10,18 @@ namespace TwoPhaseAlgorithmSolver
 
     public partial class TwoPhaseAlgorithm
   {
-        private async void InitMoveTables()
+        private void InitMoveTables()
         {
-            var initMovesTask = Task.Run(() => { this.InitMoves(); });
-            var twistMoveTableTask = Task.Run(() => { this.InitTwistMoveTable(); });
-            var flipMoveTableTask = Task.Run(() => { this.InitFlipMoveTable(); });
-            var parityMoveTask = Task.Run(() => { this.InitParityMove(); });
-            var moveTableTask = Task.Run(() => { this.InitFRtoBR_MoveTable(); });
-            var table1Task = Task.Run(() => { this.InitURFtoDLF_MoveTable(); });
-            var table2Task = Task.Run(() => { this.InitURtoUL_MoveTable(); });
-            var table3Task = Task.Run(() => { this.InitUBtoDF_MoveTable(); });
-            var table4Task = Task.Run(() => { this.InitURtoDF_MoveTable(); });
-            var table5Task = Task.Run(() => { this.InitMergeURtoULandUBtoDF(); });
-            await Task.WhenAll(initMovesTask, twistMoveTableTask, flipMoveTableTask, parityMoveTask, moveTableTask, table1Task, table2Task, table3Task, table4Task, table5Task);
-
+            this.InitMoves();
+            this.InitTwistMoveTable();
+            this.InitFlipMoveTable();
+            this.InitParityMove();
+            this.InitFRtoBR_MoveTable();
+            this.InitURFtoDLF_MoveTable();
+            this.InitURtoUL_MoveTable();
+            this.InitUBtoDF_MoveTable();
+            this.InitURtoDF_MoveTable();
+            this.InitMergeURtoULandUBtoDF();
         }
 
         private CoordCube[] moves = new CoordCube[N_MOVE];
