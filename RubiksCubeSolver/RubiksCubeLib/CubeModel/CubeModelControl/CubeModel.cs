@@ -404,19 +404,30 @@ namespace RubiksCubeLib.CubeModel
                     b = this._brushes[_brushIndex];
 
                 g.FillPolygon(b, parr);
-                g.DrawPolygon(new Pen(Color.Black, 1), parr);
+                using (var pen = new Pen(Color.Black, 1))
+                {
+                    g.DrawPolygon(pen, parr);
+                }
 
-                GraphicsPath gp = new GraphicsPath();
-                gp.AddPolygon(parr);
-                if (gp.IsVisible(mousePos))
-                    pos = facePos;
+                using (GraphicsPath gp = new GraphicsPath())
+                {
+                    gp.AddPolygon(parr);
+                    if (gp.IsVisible(mousePos))
+                        pos = facePos;
+                }
             }
 
-            g.FillRectangle(new SolidBrush(this.BackColor), 0, this.Height - 25, this.Width - 1, 24);
+            using (var solidBrush = new SolidBrush(this.BackColor))
+            {
+                g.FillRectangle(solidBrush, 0, this.Height - 25, this.Width - 1, 24);
+            }
             g.DrawRectangle(Pens.Black, 0, this.Height - 25, this.Width - 1, 24);
             g.DrawString(string.Format("[{0}] | {1}", _currentSelection.CubePosition, _currentSelection.FacePosition), this.Font, Brushes.Black, 5, this.Height - 20);
 
-            g.FillRectangle(new SolidBrush(this.BackColor), 0, this.Height - 50, this.Width - 1, 25);
+            using (var solidBrush = new SolidBrush(this.BackColor))
+            {
+                g.FillRectangle(solidBrush, 0, this.Height - 50, this.Width - 1, 25);
+            }
             g.DrawRectangle(Pens.Black, 0, this.Height - 50, this.Width - 1, 25);
             g.DrawString(this.State, this.Font, Brushes.Black, 5, this.Height - 45);
 
@@ -450,7 +461,7 @@ namespace RubiksCubeLib.CubeModel
             foreach (Face3D face in frame)
             {
                 #region CalculatePoints
-
+                Brush b = new SolidBrush(face.Color);
                 int x = 0, y = 0;
                 int xOffs = borderX, yOffs = borderY;
 
@@ -503,40 +514,58 @@ namespace RubiksCubeLib.CubeModel
                 }
                 #endregion
 
-                Point[] parr = new Point[] { new Point(x, y), new Point(x, y + square), new Point(x + square, y + square), new Point(x + square, y) };
+                var parr = new[] { new Point(x, y), new Point(x, y + square), new Point(x + square, y + square), new Point(x + square, y) };
 
-                Brush b = new SolidBrush(face.Color);
-                double factor = ((Math.Sin((double)Environment.TickCount / (double)200) + 1) / 4) + 0.75;
-                PositionSpec facePos = new PositionSpec() { FacePosition = face.Position, CubePosition = face.MasterPosition };
+                var factor = ((Math.Sin(Environment.TickCount / (double)200) + 1) / 4) + 0.75;
+                var facePos = new PositionSpec { FacePosition = face.Position, CubePosition = face.MasterPosition };
 
                 if (this.MouseHandling)
                 {
-                    if (_selections[facePos].HasFlag(Selection.Second))
-                        b = new HatchBrush(HatchStyle.Percent75, Color.Black, face.Color);
-                    else if (_selections[facePos].HasFlag(Selection.NotPossible))
-                        b = new SolidBrush(Color.FromArgb(face.Color.A, (int)(face.Color.R * 0.3), (int)(face.Color.G * 0.3), (int)(face.Color.B * 0.3)));
-                    else if (_selections[facePos].HasFlag(Selection.First))
-                        b = new HatchBrush(HatchStyle.Percent30, Color.Black, face.Color);
-                    else if (_selections[facePos].HasFlag(Selection.Possible))
-                        b = new SolidBrush(Color.FromArgb(face.Color.A, (int)(Math.Min(face.Color.R * factor, 255)), (int)(Math.Min(face.Color.G * factor, 255)), (int)(Math.Min(face.Color.B * factor, 255))));
-                    else b = new SolidBrush(face.Color);
+                    if (this._selections[facePos].HasFlag(Selection.Second)) b = new HatchBrush(HatchStyle.Percent75, Color.Black, face.Color);
+                    else if (this._selections[facePos].HasFlag(Selection.NotPossible))
+                        b =
+                            new SolidBrush(
+                                Color.FromArgb(
+                                    face.Color.A,
+                                    (int)(face.Color.R * 0.3),
+                                    (int)(face.Color.G * 0.3),
+                                    (int)(face.Color.B * 0.3)));
+                    else if (this._selections[facePos].HasFlag(Selection.First)) b = new HatchBrush(HatchStyle.Percent30, Color.Black, face.Color);
+                    else if (this._selections[facePos].HasFlag(Selection.Possible))
+                        b =
+                            new SolidBrush(
+                                Color.FromArgb(
+                                    face.Color.A,
+                                    (int)(Math.Min(face.Color.R * factor, 255)),
+                                    (int)(Math.Min(face.Color.G * factor, 255)),
+                                    (int)(Math.Min(face.Color.B * factor, 255))));
                 }
+                /* Code hieronder is overbodig omdat de brush al zo ge declareerd is
+                else b = new SolidBrush(face.Color);
+            }
                 else
-                    b = new SolidBrush(face.Color);
+                    b = new SolidBrush(face.Color);  */
 
                 g.FillPolygon(b, parr);
-                g.DrawPolygon(new Pen(Color.Black, 1), parr);
+                using (var pen = new Pen(Color.Black, 1))
+                {
+                    g.DrawPolygon(pen, parr);
+                }
 
+                using (var gp = new GraphicsPath())
+                {
+                    gp.AddPolygon(parr);
+                    if (gp.IsVisible(mousePos))
+                        pos = facePos;
 
-                GraphicsPath gp = new GraphicsPath();
-                gp.AddPolygon(parr);
-                if (gp.IsVisible(mousePos))
-                    pos = facePos;
+                    b.Dispose();
+                }
             }
 
             g.DrawRectangle(Pens.Black, 0, this.Height - 25, this.Width - 1, 24);
             //g.DrawLine(Pens.Black, 0, this.Height - 25, this.Width, this.Height - 25);
-            g.DrawString(string.Format("[{0}] | {1}", _currentSelection.CubePosition, _currentSelection.FacePosition), this.Font, Brushes.Black, 5, this.Height - 20);
+            g.DrawString(
+                $"[{this._currentSelection.CubePosition}] | {this._currentSelection.FacePosition}", this.Font, Brushes.Black, 5, this.Height - 20);
 
             g.DrawRectangle(Pens.Black, 0, this.Height - 50, this.Width - 1, 25);
             g.DrawString(this.State, this.Font, Brushes.Black, 5, this.Height - 45);

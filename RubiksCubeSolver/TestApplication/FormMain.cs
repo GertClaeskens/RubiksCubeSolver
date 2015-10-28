@@ -49,10 +49,12 @@ namespace TestApplication
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog fbd = new FolderBrowserDialog();
-            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            using (FolderBrowserDialog fbd = new FolderBrowserDialog())
             {
-                solverPlugins.AddFolder(fbd.SelectedPath);
+                if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    solverPlugins.AddFolder(fbd.SelectedPath);
+                }
             }
         }
 
@@ -68,20 +70,24 @@ namespace TestApplication
 
         private void solveToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            DialogSolutionFinder dlg = new DialogSolutionFinder(new TwoPhaseAlgorithm(), this.cubeModel.Rubik, this);
-            //DialogSolutionFinder dlg = new DialogSolutionFinder(new BeginnerSolver(), this.cubeModel.Rubik, this);
-            //DialogSolutionFinder dlg = new DialogSolutionFinder(new FridrichSolver(), this.cubeModel.Rubik, this);
-            if (dlg.ShowDialog() == DialogResult.OK)
+            using (DialogSolutionFinder dlg = new DialogSolutionFinder(new TwoPhaseAlgorithm(), this.cubeModel.Rubik, this))
             {
-                rotations.Clear();
-                dlg.Algorithm.Moves.ForEach(m => rotations.Add(m));
+                //DialogSolutionFinder dlg = new DialogSolutionFinder(new BeginnerSolver(), this.cubeModel.Rubik, this);
+                //DialogSolutionFinder dlg = new DialogSolutionFinder(new FridrichSolver(), this.cubeModel.Rubik, this);
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    rotations.Clear();
+                    dlg.Algorithm.Moves.ForEach(m => rotations.Add(m));
+                }
             }
         }
 
         private void parityTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogParityCheckResult parityCheck = new DialogParityCheckResult(cubeModel.Rubik, this);
-            parityCheck.ShowDialog();
+            using (DialogParityCheckResult parityCheck = new DialogParityCheckResult(cubeModel.Rubik, this))
+            {
+                parityCheck.ShowDialog();
+            }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -148,8 +154,10 @@ namespace TestApplication
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FormAbout frmAbout = new FormAbout();
-            frmAbout.ShowDialog();
+            using (FormAbout frmAbout = new FormAbout())
+            {
+                frmAbout.ShowDialog();
+            }
         }
 
         private void FormMain_Activated(object sender, EventArgs e)
